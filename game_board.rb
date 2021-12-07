@@ -155,15 +155,100 @@ class GameBoard
       raise ArgumentError("Invalid intersection y coordinate")
     end
 
-    # TODO: Check @intersections[x][y + 1] and @intersections[x][y - 1] for vertical mill
-    # TODO: Check @intersections[x + 1][y] and @intersections[x - 1][y] for horizontal mill
-    # See page Appendix A (pg 70) of the spec
+    piece_in_vertical_mill = true
+    piece_in_horizontal_mill = true
+
+    if x == 3
+      if y < 3
+        (0..3).each { |i|
+          if @intersections[x] != nil && @intersections[x][i] != nil
+            if @intersections[x][i].get_occupant_colour? != colour
+              piece_in_vertical_mill = false
+            end
+          end
+        }
+      else
+        (4..7).each { |i|
+          if @intersections[x] != nil && @intersections[x][i] != nil
+            if @intersections[x][i].get_occupant_colour? != colour
+              piece_in_vertical_mill = false
+            end
+          end
+        }
+      end
+
+      (0..7).each { |i|
+        if @intersections[i] != nil && @intersections[i][y] != nil
+          if @intersections[i][y].get_occupant_colour? != colour
+            piece_in_horizontal_mill = false
+          end
+        end
+      }
+    elsif y ==3
+      if x < 3
+        (0..3).each { |i|
+          if @intersections[i] != nil && @intersections[i][y] != nil
+            if @intersections[i][y].get_occupant_colour? != colour
+              piece_in_horizontal_mill = false
+            end
+          end
+        }
+      else
+        (4..6).each { |i|
+          if @intersections[i] != nil && @intersections[i][y] != nil
+            if @intersections[i][y].get_occupant_colour? != colour
+              piece_in_horizontal_mill = false
+            end
+          end
+        }
+      end
+      (0..7).each { |i|
+        if @intersections[i] != nil && @intersections[i][y] != nil
+          if @intersections[i][y].get_occupant_colour? != colour
+            piece_in_vertical_mill = false
+          end
+        end
+      }
+    else
+      (0..7).each { |i|
+        if @intersections[x] != nil && @intersections[x][i] != nil
+          if @intersections[x][i].get_occupant_colour? != colour
+            piece_in_vertical_mill = false
+          end
+        end
+      }
+      (0..7).each { |i|
+        if @intersections[x] != nil && @intersections[x][i] != nil
+          if @intersections[x][i].get_occupant_colour? != colour
+            piece_in_vertical_mill = false
+          end
+        end
+      }
+      (0..7).each { |i|
+        if @intersections[i] != nil && @intersections[i][y] != nil
+          if @intersections[i][y].get_occupant_colour? != colour
+            piece_in_horizontal_mill = false
+          end
+        end
+      }
+    end
+
+    piece_in_horizontal_mill || piece_in_vertical_mill
   end
 
   # Searches the board to find if there is a Piece of a specified colour that is not in a mill
   # @param [Symbol] colour Colour of the Pieces to search for
   # @return [Boolean] True if there is a Piece on the board that is of the specified colour and not in a mill, else false
   def exist_piece_not_in_mill(colour)
-    # TODO
+    retval = false
+    @intersections&.each do |i|
+      i.each do |j|
+        if @intersections[i][j].get_occupant_colour? == colour
+          retval = true unless is_piece_in_mill(colour, i, j)
+        end
+      end
+    end
+
+    retval
   end
 end
