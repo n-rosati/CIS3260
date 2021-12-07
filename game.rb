@@ -39,13 +39,13 @@ class Game
 
   # Update the game state such that it is the opposite player's turn
   def nextTurn
-    if(turn_colour == :white)
+    if turn_colour == :white
       @turn_colour = :black
-    elsif(turn_colour == :black)
+    elsif turn_colour == :black
       @turn_colour = :white
     end
-    if(phase == :place)
-      if(player1.is_bag_empty && player2.is_bag_empty)
+    if @phase == :place
+      if @player1.is_bag_empty && player2.is_bag_empty
         nextPhase
       end
     end
@@ -68,9 +68,9 @@ class Game
 
   # Sets the game's winner based on the current player's turn
   def endGame
-    if(turn_colour == :white)
+    if @turn_colour == :white
       @winner = :white
-    elsif(turn_colour == :black)
+    elsif @turn_colour == :black
       @winner = :black
     end
   end
@@ -83,21 +83,21 @@ class Game
   # Provides a reponse to a requested draw
   # @param [String] response The string response provided to an offered draw. Should be "accept" or "decline"
   def respondDraw(response)
-    if(!@draw_flag == :set)
+    if !@draw_flag == :set
       raise RuntimeError("Draw flag must be set before responding to a draw")
     end
-    if(response == "accept")
+    if response == "accept"
       @winner = "none"
-    elsif(reponse == "decline")
+    elsif reponse == "decline"
       @draw_flag = :unset
     end
   end
 
   # Player forfeits the game, causing the opposing player to win
   def forfeit
-    if(turn_colour == :white)
+    if @turn_colour == :white
       @winner = :black
-    elsif(turn_colour == :black)
+    elsif @turn_colour == :black
       @winner = :white
     end
   end
