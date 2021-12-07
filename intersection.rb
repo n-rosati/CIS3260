@@ -1,6 +1,6 @@
 class Intersection
-  # @param [String] x
-  # @param [Integer] y
+  # @param [String] x Intersection x coordinate
+  # @param [Integer] y Intersection y coordinate
   # @param [Piece] occupant Optional. Piece that is in the intersection.
   def initialize(x, y, occupant = nil)
     if !x.is_a?(String)
