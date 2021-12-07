@@ -14,7 +14,7 @@ class Bag
   # @param [Piece] piece The Piece to put in the Bad
   def store_piece(piece)
     unless piece.instance_of?(Piece)
-      raise TypeError("Parameter `piece` must be instance of Piece")
+      raise TypeError("Parameter must be instance of Piece")
     end
 
     @pieces.push(piece)
