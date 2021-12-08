@@ -1,0 +1,15 @@
+<div class="navbar navbar-inverse navbar-fixed-top py-4" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+    </div>
+    <ul class="nav navbar-nav">
+    </ul>
+    <div class="nav navbar-nav navbar-right">
+      <div class="d-flex">
+        <% if player_signed_in? %>
+          <button class="btn btn-success btn-lg btn-shadow">Logged In As: <%= "#{current_player.email}" %></button>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

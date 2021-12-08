@@ -1,0 +1,27 @@
+  <div class="navbar navbar-inverse navbar-fixed-top py-4" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+       <%= link_to root_path do %>
+        <%= image_tag "logo.jpg", alt:"Nine Men's Morris", size:"50x50" %>
+       <% end %> |
+       <%= link_to "Player Page" , root_path, method: :get, class:"btn btn-success btn-lg mr-2" %>
+       <% if player_signed_in? %>
+        <button class="btn btn-dark btn-lg mr-2">Wins: <%= "#{current_player.wins}" %></button>
+        <button class="btn btn-dark btn-lg mr-2">Losses: <%= "#{current_player.losses}" %></button>
+       <% end %>
+     </div>
+     <ul class="nav navbar-nav">
+     </ul>
+     <div class="nav navbar-nav navbar-right">
+       <div class="d-flex">
+         <% if player_signed_in? %>
+           <%= link_to current_player.email, edit_player_registration_path, class:"btn btn-success btn-lg mr-2" %>
+           <%= link_to "Log Out" , destroy_player_session_path, method: :get, class:"btn btn-danger btn-lg mr-2" %>
+         <% else %>
+           <%= link_to "Log In", player_session_path, class:"btn btn-success btn-lg mr-2" %>
+           <%= link_to "Sign Up", new_player_registration_path, class:"btn btn-primary btn-lg" %>
+         <% end %>
+       </div>
+     </div>
+   </div>
+</div>

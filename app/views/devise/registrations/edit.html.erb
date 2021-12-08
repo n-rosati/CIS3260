@@ -1,0 +1,64 @@
+<div class="text-center">
+  <h2>Account Settings</h2>
+</div>
+
+<div class="d-flex justify-content-center">
+  
+  <div class="card text-center p-5">
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
+
+      <h4>Update Email and Password</h4>
+      <br />
+
+      <div class="field">
+        <%= f.email_field :email, autofocus: true, autocomplete: "Enter New Email", placeholder:'Enter New Email', class:'form-control mb-4' %>
+      </div>
+
+      <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+        <div>Awaiting Confirmation For: <%= resource.unconfirmed_email %></div>
+      <% end %>
+
+      <div class="field">
+        <em>(New Password Must Be <%= @minimum_password_length %> Characters Minimum)</em>
+        <%= f.password_field :password, autocomplete: "Enter New Password", placeholder:'Enter New Password', class:'form-control' %>
+        <% if @minimum_password_length %>
+          <br />
+        <% end %>
+      </div>
+
+      <div class="field">
+        <%= f.password_field :password_confirmation, autocomplete: "Confirm New Password", placeholder:'Confirm New Password', class:'form-control mb-4'  %>
+      </div>
+
+      <div class="field">
+        <em>(Required to Update Email and/or Password)</em>
+        <%= f.password_field :current_password, autocomplete: "Confirm Current Password", placeholder:'Confirm Current Password', class:'form-control mb-4'  %>
+      </div>
+
+      <div class="actions mb-4">
+        <%= f.submit "Update Account", class:'btn btn-success btn-shadow btn-block' %>
+      </div>
+    <% end %>
+
+    <div class="d-flex justify-content-center">
+      <div class="text-center">
+        
+        <br /><br />
+        <h4>Delete Account</h4>
+        <br />
+
+        <div class="card pb-3 text-center" style="width:33vw; border:2px solid red;">
+          <h6 class="text-danger m-3">*** IRREVERSIBLE ACTION WARNING ***</h6>
+          <h6 class="text-left text-danger m-3">This will permanently delete your account and all of its associated data. Do you wish to proceed?</h6>
+          <%= button_to "Delete Account", registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete, class:'btn btn-danger btn-shadow' %>
+        </div>
+        <br/><br/>
+
+        <%= link_to "Back", :back, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="row" style="text-align:center">
+  <div><%= image_tag "welcome.jpg", alt:"Welcome to Nine Men's Morris", size:"600x170" %></div>
+</div>
+<br/><br/>
+
+<div class="row" style="text-align:center">
+  <div class="d-flex justify-content-center">
+    <div class="card text-center p-5">
+
+      <% if player_signed_in? %>
+
+        <p><h5><b>Player:</b> <%= current_player.email %></strong></h5></p>
+        <p><h5><b>Wins:</b> <%= current_player.wins %></h5></p>
+        <p><h5><b>Losses:</b> <%= current_player.losses %></h5></p>
+
+        <div style="text-align:center">
+          <%= link_to "Start Game", new_game_path, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+          <%= link_to "Logout", destroy_player_session_path, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+        </div>
+
+        <div style="text-align:right">
+          <%= button_to "Delete Account?", registration_path(current_player), data: { confirm: "Are you sure?" }, method: :delete, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+        </div>
+
+      <% else %>
+
+        <h6>Please login or sign up to continue.</h6>
+
+      <% end %>
+
+    </div>
+  </div>
+</div>

@@ -1,4 +1,10 @@
 class Player < ApplicationRecord
-  has_secure_password
-  has_one :game, :bag
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable
+
+  before_create :initialize_player
+  def initialize_player()
+  end
 end
