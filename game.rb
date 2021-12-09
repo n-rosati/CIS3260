@@ -87,7 +87,7 @@ class Game
       raise RuntimeError("Draw flag must be set before responding to a draw")
     end
     if response == "accept"
-      @winner = "none"
+      @winner = :none
     elsif reponse == "decline"
       @draw_flag = :unset
     end
