@@ -1,16 +1,16 @@
 class Piece
 	# Creates a new Piece
 	# @param [Symbol] colour The colour of the Piece to create. Can be either `:white` or `:black`
-	def initialize(colour_sym)
-		if colour_sym != :white && colour_sym != :black
+	def initialize(colour)
+		if colour != :white && colour != :black
 			raise TypeError("Parameter must be :white or :black")
 		end
 
-		@colour_sym = colour_sym
+		@colour = colour
 	end
 
 	# @return [Symbol] The colour of the Piece
-	def colour_sym
-		@colour_sym
+	def colour
+		@colour
 	end
 end

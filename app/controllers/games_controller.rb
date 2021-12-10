@@ -2,46 +2,54 @@ require_relative './fd/Final_Design_Classes.rb'
 
 class GamesController < ApplicationController
 
-  def index()
-    @game = gameJsonToGameObj(current_player.game)
-    if params["commit"] == "Place"
-      place_piece(params)
-    end
-  end
+  # Matchmaking Page
+  def matchmaking()
 
-  def find_match()
-
-    opponent_found = false
-    if current_player.opponent_id == -1
-      Player.all.each do |p|
-        if current_player.id != p.id && p.opponent_id == -1
-          opponent_found = true
-          current_player.opponent_id = p.id
-          p.opponent_id = current_player.id
-          current_player.save()
-          p.save()
-        end
-      end
+    has_opponent = false
+    if current_player.opponent_id != -1
+      has_opponent = true
     else
-      opponent_found = true
+      current_player.searching = true
+      current_player.save()
     end
-    if opponent_found == false
-      redirect_to find_match_path
-      return
+
+    if has_opponent == false
+      Player.all.each do |p|
+        # skip invalid possibilities
+        if p.id == current_player.id || p.opponent_id != -1 || p.searching == false
+          next
+        end
+        
+        # opponent found
+        current_player.colour = "white"
+        current_player.searching = false
+        current_player.opponent_id = p.id
+        p.colour = "black"
+        p.searching = false
+        p.opponent_id = current_player.id
+        current_player.save()
+        p.save()
+        has_opponent = true
+        break
+      end
+      
+      if has_opponent == false
+        redirect_to game_path
+        return
+      end
     end
 
     intersections = [
-      [Intersection.new("a", 7), nil, nil, Intersection.new("d", 7), nil, nil, Intersection.new("g", 7)],
-      [nil, Intersection.new("b", 6), nil, Intersection.new("d", 6), nil, Intersection.new("f", 6)], 
-      [nil, nil, Intersection.new("c", 5), Intersection.new("d", 5), Intersection.new("e", 5), nil, nil],
-      [Intersection.new("a", 4), Intersection.new("b", 4), Intersection.new("c", 4), nil, Intersection.new("e", 4), Intersection.new("f", 4), Intersection.new("g", 4)], 
+      [Intersection.new("a", 1), nil, nil, Intersection.new("d", 1), nil, nil, Intersection.new("g", 1)],
+      [nil, Intersection.new("b", 2), nil, Intersection.new("d", 2), nil, Intersection.new("f", 2), nil],
       [nil, nil, Intersection.new("c", 3), Intersection.new("d", 3), Intersection.new("e", 3), nil, nil],
-      [nil, Intersection.new("b", 2), nil, Intersection.new("d", 2), nil, Intersection.new("f", 2), nil], 
-      [Intersection.new("a", 1), nil, nil, Intersection.new("d", 1), nil, nil, Intersection.new("g", 1)]
+      [Intersection.new("a", 4), Intersection.new("b", 4), Intersection.new("c", 4), nil, Intersection.new("e", 4), Intersection.new("f", 4), Intersection.new("g", 4)], 
+      [nil, nil, Intersection.new("c", 5), Intersection.new("d", 5), Intersection.new("e", 5), nil, nil],
+      [nil, Intersection.new("b", 6), nil, Intersection.new("d", 6), nil, Intersection.new("f", 6), nil],
+      [Intersection.new("a", 7), nil, nil, Intersection.new("d", 7), nil, nil, Intersection.new("g", 7)],
     ]
     
     opponent_player = Player.find(current_player.opponent_id)
-    opponent_player.colour = "black"
     board_obj = GameBoard.new(intersections)
 
     current_player_bag_obj = Bag.new()
@@ -66,18 +74,44 @@ class GamesController < ApplicationController
 
   end
 
+  # Game Page
+  def index()
+
+    if current_player.game != nil
+      @game = gameJsonToGameObj(current_player.game)
+    end
+    if params["commit"] == "Place"
+      place_piece(params)
+    end
+
+  end
+
   def place_piece(params)
 
-    x = params['x'].to_i() + 1
-    y = params['y'].to_i()
+    x = params['x'].ord() - 97
+    y = params['y'].to_i() - 1
 
-
+    coordinate = params['x'] + params['y']
+    valid_intersections = ['a7', 'd7', 'g7', 'b6', 'd6', 'f6', 'c5', 'd5', 'e5', 'a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'c3', 'd3', 'e3', 'b2', 'd2', 'f2', 'a1', 'd1', 'g1']
+    if @game.turn_colour != current_player.colour.to_sym()
+      flash.alert = "Please wait your turn. Opponent player is taking turn."
+      redirect_to game_path
+      return
+    end
+    if !valid_intersections.include?(coordinate)
+      flash.alert = "Please provide a valid intersection to proceed with piece placement."
+      redirect_to game_path
+      return
+    elsif !@game.player1.board.is_empty_intersection(x, y)
+      puts(x, y)
+      flash.alert = "The intersection selected is occupied. Please select another intersection."
+      redirect_to game_path
+      return
+    end
+    
     curr_player_colour = current_player.colour.to_sym()
     if @game.player1.colour == curr_player_colour
 
-      puts("Class: ")
-      puts(@game.player1.bag.select_piece.class)
-      puts()
       if @game.turn_colour == :white
         @game.player1.place_piece_on_board(x, y, @game.player1.bag.select_piece)
         @game.alternate_turn()
@@ -98,8 +132,12 @@ class GamesController < ApplicationController
       
     end
 
-    current_player.game = @game
+    current_player.game = @game.to_json()
     current_player.save()
+
+    opponent_player = Player.find(current_player.opponent_id)
+    opponent_player.game = @game.to_json()
+    opponent_player.save()
 
     redirect_to game_path
     
@@ -135,8 +173,12 @@ class GamesController < ApplicationController
       
     end
 
-    current_player.game = @game
+    current_player.game = @game.to_json()
     current_player.save()
+
+    opponent_player = Player.find(current_player.opponent_id)
+    opponent_player.game = game_obj.to_json()
+    opponent_player.save()
 
     redirect_to game_path
 

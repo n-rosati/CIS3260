@@ -4,6 +4,10 @@ class Bag
 		@pieces = []
 	end
 
+	def pieces
+		@pieces
+	end
+
 	def length
 		@pieces.length
 	end

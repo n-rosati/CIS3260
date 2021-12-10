@@ -13,7 +13,6 @@
 ActiveRecord::Schema.define(version: 2021_12_08_191022) do
 
   create_table "players", force: :cascade do |t|
-	# t.primary_key "player_id", null: false
 	t.string "email", default: "", null: false
 	t.string "encrypted_password", default: "", null: false
 	t.string "reset_password_token"
@@ -23,10 +22,11 @@ ActiveRecord::Schema.define(version: 2021_12_08_191022) do
 	t.datetime "updated_at", precision: 6, null: false
 	t.index ["email"], name: "index_players_on_email", unique: true
 	t.index ["reset_password_token"], name: "index_players_on_reset_password_token", unique: true
-	t.string "colour", default: "white"
-	t.integer "wins", default: 0
-	t.integer "losses", default: 0
+	t.string "colour"
+	t.integer "wins", default: 0, null: false
+	t.integer "losses", default: 0, null: false
 	t.string "game"
+	t.boolean "searching", default: false, null: false
 	t.integer "opponent_id", default: -1, null: false
   end
 

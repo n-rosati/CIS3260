@@ -44,7 +44,7 @@ class Intersection
 
 	# @return [Integer] The x value as an integer
 	def get_x_as_integer
-		@x.ord - 97
+		@x.ord() - 97
 	end
 
 	# Clears the intersection occupant
@@ -63,11 +63,11 @@ class Intersection
 	end
 
 	# @return [Symbol, nil] Returns the colour of the occupant, nil if no occupant in intersection
-	def get_occupant_colour?
+	def get_occupant_colour
 		if !!@occupant
-			@occupant.get_colour
+			@occupant.colour.to_s()
 		else
-			nil
+			"nil"
 		end
 	end
 end

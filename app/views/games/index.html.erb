@@ -3,94 +3,135 @@
 </div>
 <br/><br/>
 
-<%# game = gameJsonToGameObj(current_player.game) %>
+<% if current_player.searching == false && @game != nil %>
 
-<div class="row" style="text-align:center">
+  <div class="row" style="text-align:center">
 
-	<div class="col-lg-6 col-md-6 col-sm-12">
-		<div class="d-flex justify-content-center">
-			<div class="card text-center p-5">
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <div class="d-flex justify-content-center">
+        <div class="card text-center p-5">
 
-        <% intersections = @game.player1.board.intersections %>
-        <% row1 = intersectionsToString(intersections[0]) %>
-        <% row2 = intersectionsToString(intersections[1]) %>
-        <% row3 = intersectionsToString(intersections[2]) %>
-        <% row4 = intersectionsToString(intersections[3]) %>
-        <% row5 = intersectionsToString(intersections[4]) %>
-        <% row6 = intersectionsToString(intersections[5]) %>
-        <% row7 = intersectionsToString(intersections[6]) %>
-
-				<div class="data">
-          <pre>  <%= "7   %s — — — — — — — — — %s — — — — — — — — — %s" % row1 %></pre>
-          <pre>  <%= "    |                   |                   |" %></pre>
-          <pre>  <%= "6   |     %s — — — — — — %s — — — — — — %s     |" % row2 %></pre>
-          <pre>  <%= "    |     |             |             |     |" %></pre>
-          <pre>  <%= "5   |     |     %s — — — %s — — — %s     |     |" % row3 %></pre>
-          <pre>  <%= "    |     |     |               |     |     |" %></pre>
-          <pre>  <%= "4   %s — — %s — — %s               %s — — %s — — %s" % row4 %></pre>
-          <pre>  <%= "    |     |     |               |     |     |" %></pre>
-          <pre>  <%= "3   |     |     %s — — — %s — — — %s     |     |" % row5 %></pre>
-          <pre>  <%= "    |     |             |             |     |" %></pre>
-          <pre>  <%= "2   |     %s — — — — — — %s — — — — — — %s     |" % row6 %></pre>
-          <pre>  <%= "    |                   |                   |" %></pre>
-          <pre>  <%= "1   %s — — — — — — — — — %s — — — — — — — — — %s" % row7 %></pre>
-          <pre>  <%= "    a     b     c       d       e     f     g" %></pre>
-          .format([o, ⬜, ⬛, ⚪, ⚫])
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-	<div class="col-lg-6 col-md-6 col-sm-12">
-		<div class="d-flex justify-content-center">
-			<div class="card text-center p-5">
-        
-        <% if @game.player1.name() == current_player.email %>
-          <% bag = @game.player1.bag %>
-        <% else %>
-          <% bag = @game.player2.bag %>
-        <% end %>
-
-        <% if bag.length > 0 %>
-          <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
-          <br/>
-          <pre><b>Pieces in bag:</b> <%= bag.length %></pre>
-          <br/>
-
-          <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
-          <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
-          <%= form_tag(game_path, method: "get") do %>
-            <pre> <b>Choose where to place your piece.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
-            <div style="text-align:right">
-              <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
-            </div>
+          <% puts("Number of rows: #{@game.player1.board.intersections.length()}") %>
+          <% @game.player1.board.intersections.each do |r| %>
+            <% r&.each do |c| %>
+              <% if c != nil %>
+                <% print("{x = #{c.x}, y = #{c.y.to_s()}, occupant = #{c.get_occupant_colour()}}, ") %>
+              <% else %>
+                <% print("{}, ") %>
+              <% end %>
+            <% end %>
+            <% puts("") %>
           <% end %>
-        	<br/><br/>
-        <% else %>
-          <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
-          <br/>
-          <pre><b>Pieces in bag:</b> bag.length</pre>
-          <br/>
+          <% intersections = @game.player1.board.intersections.transpose() %>
+          <% row1 = intersectionsToString(intersections[6]) %>
+          <% row2 = intersectionsToString(intersections[5]) %>
+          <% row3 = intersectionsToString(intersections[4]) %>
+          <% row4 = intersectionsToString(intersections[3]) %>
+          <% row5 = intersectionsToString(intersections[2]) %>
+          <% row6 = intersectionsToString(intersections[1]) %>
+          <% row7 = intersectionsToString(intersections[0]) %>
 
-          <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
-          <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
-          <%= form_tag(game_path, method: "get") do %>
-            <pre> <b>Choose a piece to move.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
-            <div style="text-align:right">
-              <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
-            </div>
+          <div class="data">
+            <pre>  <%= "7   %s  — — — — — — — — —  %s  — — — — — — — — —  %s" % row1 %>  </pre>
+            <pre>  <%= "    |                       |                       |" %>  </pre>
+            <pre>  <%= "6   |       %s — — — — — — %s — — — — — — %s       |" % row2 %>  </pre>
+            <pre>  <%= "    |       |               |               |        |" %>  </pre>
+            <pre>  <%= "5   |       |     %s — — — %s — — — %s     |       |" % row3 %>  </pre>
+            <pre>  <%= "    |       |      |                  |      |       |" %>  </pre>
+            <pre>  <%= "4   %s — — %s — — %s               %s — — %s — — %s" % row4 %>  </pre>
+            <pre>  <%= "    |       |      |                  |      |       |" %>  </pre>
+            <pre>  <%= "3   |       |     %s — — — %s — — — %s     |       |" % row5 %>  </pre>
+            <pre>  <%= "    |       |               |               |        |" %>  </pre>
+            <pre>  <%= "2   |       %s — — — — — — %s — — — — — — %s       |" % row6 %>  </pre>
+            <pre>  <%= "    |                       |                       |" %>  </pre>
+            <pre>  <%= "1   %s  — — — — — — — — —  %s  — — — — — — — — —  %s" % row7 %>  </pre>
+            <pre>  <%= "    a       b       c       d       e       f       g" %>  </pre>
+            <%# .format([o, ⬜, ⬛, ⚪, ⚫]) %>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6 col-sm-12">
+      <div class="d-flex justify-content-center">
+        <div class="card text-center p-5">
+          
+          <% if @game.player1.name() == current_player.email %>
+            <% bag = @game.player1.bag %>
+          <% else %>
+            <% bag = @game.player2.bag %>
+          <% end %>
+
+          <% if bag.length > 0 %>
+            <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
-            <pre> <b>Choose where to move your piece to.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
-            <div style="text-align:right">
-              <%= submit_tag("Move", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
-            </div>
+            <pre><b>Current turn:</b> <%= @game.turn_colour.to_s().capitalize() %></pre>
+            <br/>
+            <pre><b>Pieces in bag:</b> <%= bag.length %></pre>
+            <br/>
+
+            <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
+            <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
+            <%= form_tag(game_path, method: "get") do %>
+              <pre> <b>Choose where to place your piece.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
+              <div style="text-align:right">
+                <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
+              </div>
+            <% end %>
+            <br/><br/>
+          <% else %>
+            <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
+            <br/>
+            <pre><b>Pieces in bag:</b> bag.length</pre>
+            <br/>
+
+            <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
+            <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
+            <%= form_tag(game_path, method: "get") do %>
+              <pre> <b>Choose a piece to move.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
+              <div style="text-align:right">
+                <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
+              </div>
+              <br/>
+              <pre> <b>Choose where to move your piece to.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
+              <div style="text-align:right">
+                <%= submit_tag("Move", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
+              </div>
+            <% end %>
+            <br/><br/>
           <% end %>
-        	<br/><br/>
-        <% end %>
 
-			</div>
-		</div>
-	</div>
+        </div>
+      </div>
+    </div>
 
-</div>
+  </div>
+
+  <% if @game.turn_colour != current_player.colour.to_sym() %>
+    <script>
+      setTimeout(function() {
+        window.location.href = "/games/index";
+      }, 2000);
+    </script>
+  <% end %>
+
+<% else %>
+
+  <div class="row" style="text-align:center">
+    <div class="d-flex justify-content-center">
+      <div class="card text-center p-5">
+
+        <h6>Please wait for game to start. Looking for opponent.</h6>
+
+      </div>
+    </div>
+  </div>
+
+<script>
+  setTimeout(function() {
+    window.location.href = "/games/index";
+  }, 5000);
+</script>
+
+<% end %>

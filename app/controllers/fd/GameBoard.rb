@@ -31,7 +31,7 @@ class GameBoard
 			raise TypeError("Second parameter must be an integer")
 		end
 
-		@intersections[x][y] == nil ? false : @intersections[x][y].is_occupied
+		@intersections[x][y].is_occupied ? false : true
 	end
 
 	# @param [Symbol] colour The colour to count Pieces for. Can be `:white` or `:black`
@@ -82,11 +82,12 @@ class GameBoard
 	# @param [Integer] y Intersection y coordinate
 	# @param [Piece] piece Piece to place on the board
 	def place_piece(x, y, piece)
+		puts("place_piece(#{x}, #{y}, { \"colour\": #{piece.colour()} })")
 		if !x.is_a?(Integer)
 			raise TypeError("First parameter must be a integer")
 		elsif !y.is_a?(Integer)
 			raise TypeError("Second parameter must be a integer")
-		elsif piece.instance_of?(Piece)
+		elsif !piece.instance_of?(Piece)
 			raise TypeError("Third parameter must be an instance of Piece")
 		end
 

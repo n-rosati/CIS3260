@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
               if i['occupant'] == nil
                 curr_row << Intersection.new(i['x'], i['y'], nil)
               else
-                curr_row << Intersection.new(i['x'], i['y'], Piece.new(i['occupant']['colour_sym'].to_sym()))
+                curr_row << Intersection.new(i['x'], i['y'], Piece.new(i['occupant']['colour'].to_sym()))
               end
             end
           end
@@ -31,11 +31,12 @@ class ApplicationController < ActionController::Base
         player1_bag_obj = Bag.new()
         player2_bag_obj = Bag.new()
         parsedPlayer1['bag']['pieces'].each do |piece|
-          player1_bag_obj.store_piece(Piece.new(piece['colour_sym'].to_sym()))
+          player1_bag_obj.store_piece(Piece.new(piece['colour'].to_sym()))
         end
         parsedPlayer2['bag']['pieces'].each do |piece|
-          player2_bag_obj.store_piece(Piece.new(piece['colour_sym'].to_sym()))
+          player2_bag_obj.store_piece(Piece.new(piece['colour'].to_sym()))
         end
+
         return Game.new(
           GamePlayer.new(parsedPlayer1['name'], parsedPlayer1['colour'].to_sym(), board_obj, player1_bag_obj),
           GamePlayer.new(parsedPlayer2['name'], parsedPlayer2['colour'].to_sym(), board_obj, player2_bag_obj),
@@ -47,7 +48,10 @@ class ApplicationController < ActionController::Base
 
       def intersectionsToString(intersections)
         intersection_strings = []
+        curr_row = 0
         intersections.each do |i|
+          puts("Row #{curr_row}")
+          curr_row += 1
           if i != nil
             intersection_strings << intersectionToString(i)
           end
@@ -56,17 +60,14 @@ class ApplicationController < ActionController::Base
       end
 
       def intersectionToString(intersection)
+        puts("Intersection at (#{intersection.x}, #{intersection.y})")
         if intersection.occupant == nil
           return "⬜"
-        elsif intersection.occupant.colour_sym == :white
+        elsif intersection.occupant.colour == :white
           return "⚪"
-        elsif intersection.occupant.colour_sym == :black
+        elsif intersection.occupant.colour == :black
           return "⚫"
         end
-      end
-
-      def x_to_int(x)
-
       end
 
 end
