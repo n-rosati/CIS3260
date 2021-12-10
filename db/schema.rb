@@ -23,38 +23,40 @@ ActiveRecord::Schema.define(version: 2021_12_08_191022) do
 	t.datetime "updated_at", precision: 6, null: false
 	t.index ["email"], name: "index_players_on_email", unique: true
 	t.index ["reset_password_token"], name: "index_players_on_reset_password_token", unique: true
-	t.string "colour"
+	t.string "colour", default: "white"
 	t.integer "wins", default: 0
 	t.integer "losses", default: 0
+	t.string "game"
+	t.integer "opponent_id", default: -1, null: false
   end
 
-  create_table "games", force: :cascade do |t|
-	# t.primary_key "board_id", null: false
-	t.string "game_phase"
-	t.string "game_status"
-	t.integer "winner"
-	t.string "draw_flag"
-  end
+#   create_table "games", force: :cascade do |t|
+# 	# t.primary_key "board_id", null: false
+# 	t.string "game_phase"
+# 	t.string "game_status"
+# 	t.integer "winner"
+# 	t.string "draw_flag"
+#   end
 
-  create_table "boards", force: :cascade do |t|
-	# t.primary_key "board_id", null: false
-  end
+#   create_table "boards", force: :cascade do |t|
+# 	# t.primary_key "board_id", null: false
+#   end
 
-  create_table "bags", force: :cascade do |t|
-	# t.primary_key "bag_id", null: false
-	t.string "piece_list"
-  end
+#   create_table "bags", force: :cascade do |t|
+# 	# t.primary_key "bag_id", null: false
+# 	t.string "piece_list"
+#   end
 
-  create_table "pieces", force: :cascade do |t|
-	# t.primary_key "piece_id", null: false
-	t.string "piece_status"
-	t.string "colour"
-  end
+#   create_table "pieces", force: :cascade do |t|
+# 	# t.primary_key "piece_id", null: false
+# 	t.string "piece_status"
+# 	t.string "colour"
+#   end
 
-  create_table "intersections", force: :cascade do |t|
-	# t.primary_key "intersection_id", null: false
-	t.string "row"
-	t.string "column"
-  end
+#   create_table "intersections", force: :cascade do |t|
+# 	# t.primary_key "intersection_id", null: false
+# 	t.string "row"
+# 	t.string "column"
+#   end
 
 end

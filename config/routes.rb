@@ -5,6 +5,9 @@ Rails.application.routes.draw do
 
   get 'games', to: 'games#new', :as => 'default_game'
   get 'games/new', to: 'games#new', :as => 'new_game'
+  get 'games/find_match' , to: 'games#find_match', :as => 'find_match'
+  # get 'games/start_game', to: 'games#index', :as => 'start_game'
+  get 'games/index', to: 'games#index', :as => 'game'
 
   # root 'sessions#check_session'
 
