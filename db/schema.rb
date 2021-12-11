@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2021_12_08_191022) do
 	t.integer "losses", default: 0, null: false
 	t.string "game"
 	t.boolean "searching", default: false, null: false
+	t.boolean "mill_found", default: false, null: false
 	t.integer "opponent_id", default: -1, null: false
   end
 

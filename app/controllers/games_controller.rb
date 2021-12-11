@@ -53,11 +53,11 @@ class GamesController < ApplicationController
     board_obj = GameBoard.new(intersections)
 
     current_player_bag_obj = Bag.new()
-    for i in 0..0
+    for i in 0..2
 			current_player_bag_obj.store_piece(Piece.new(current_player.colour.to_sym()))
 		end
     opponent_player_bag_obj = Bag.new()
-    for i in 0..0
+    for i in 0..2
 			opponent_player_bag_obj.store_piece(Piece.new(opponent_player.colour.to_sym()))
 		end
     
@@ -84,9 +84,10 @@ class GamesController < ApplicationController
       place_piece(params)
     elsif params["commit"] == "Move"
       move_piece(params)
+    elsif params["commit"] == "Capture"
+      capture_piece(params)
     end
     
-
   end
 
   private
@@ -112,35 +113,22 @@ class GamesController < ApplicationController
       redirect_to game_path
       return
     end
-    
-    curr_player_colour = current_player.colour.to_sym()
-    if @game.player1.colour == curr_player_colour
 
-      if @game.turn_colour == :white
-        @game.player1.place_piece_on_board(x, y, @game.player1.bag.select_piece)
-        @game.alternate_turn()
-      elsif @game.turn_colour == :black
-        @game.player1.place_piece_on_board(x, y, @game.player1.bag.select_piece)
-        @game.alternate_turn()
-      end
-
-    elsif @game.player2.colour == curr_player_colour
-
-      if @game.turn_colour == :white
-        @game.player2.place_piece_on_board(x, y, @game.player2.bag.select_piece)
-        @game.alternate_turn()
-      elsif @game.turn_colour == :black
-        @game.player2.place_piece_on_board(x, y, @game.player2.bag.select_piece)
-        @game.alternate_turn()
-      end
-      
+    player = getCurrentPlayerObj(@game, current_player)
+    player.place_piece_on_board(x, y, player.bag.select_piece)
+    puts(current_player.mill_found)
+    current_player.mill_found = player.board.is_piece_in_mill(current_player.colour.to_sym(), x, y)
+    puts(current_player.mill_found)
+    if current_player.mill_found == false
+      @game.alternate_turn()
     end
 
-    current_player.game = @game.to_json()
+    gameJson = @game.to_json()
+    current_player.game = gameJson
     current_player.save()
 
     opponent_player = Player.find(current_player.opponent_id)
-    opponent_player.game = @game.to_json()
+    opponent_player.game = gameJson
     opponent_player.save()
 
     redirect_to game_path
@@ -182,38 +170,59 @@ class GamesController < ApplicationController
       flash.alert = "The intersection selected to move a piece from has a piece that does not belong to you. Please select another intersection."
       redirect_to game_path
       return
-    elsif !moveCheck(from_x, from_y, to_x, to_y)
+    elsif @game.player1.board.count_pieces_on_board(current_player.colour.to_sym()) > 3 && !isMoveAdjacent(from_x, from_y, to_x, to_y)
       flash.alert = "The intersection selected to move a piece to is not adjacent to the intersection selected to move a piece from. Please select another intersection."
       redirect_to game_path
       return
     end
 
-
-    
-
-    curr_player_colour = current_player.colour.to_sym()
-    if @game.player1.colour == curr_player_colour
-
-      if @game.turn_colour == :white && @game.player1.board.check_occupant_colour_matches_turn(:white, from_x, from_y)
-        @game.player1.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
-        @game.alternate_turn()
-      elsif @game.turn_colour == :black && @game.player1.board.check_occupant_colour_matches_turn(:black, from_x, from_y)
-        @game.player1.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
-        @game.alternate_turn()
-      end
-
-    elsif @game.player2.colour == curr_player_colour
-
-      if @game.turn_colour == :white && @game.player2.board.check_occupant_colour_matches_turn(:white, from_x, from_y)
-        @game.player2.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
-        @game.alternate_turn()
-      elsif @game.turn_colour == :black && @game.player2.board.check_occupant_colour_matches_turn(:black,from_x, from_y)
-        @game.player2.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
-        @game.alternate_turn()
-      end
-      
+    player = getCurrentPlayerObj(@game, current_player)
+    player.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
+    current_player.mill_found = player.board.is_piece_in_mill(current_player.colour.to_sym(), to_x, to_y)
+    if current_player.mill_found == false
+      @game.alternate_turn()
     end
 
+    gameJson = @game.to_json()
+    current_player.game = gameJson
+    current_player.save()
+
+    opponent_player = Player.find(current_player.opponent_id)
+    opponent_player.game = gameJson
+    opponent_player.save()
+
+    redirect_to game_path
+
+  end
+
+  def capture_piece(params)
+
+    x = params['x'].ord() - 97
+    y = params['y'].to_i() - 1
+    oppositeColour = @game.turn_colour.to_s == :white.to_s ? :black : :white
+
+    if @game.turn_colour != current_player.colour.to_sym()
+      flash.alert = "Please wait your turn. Opponent player is taking turn."
+      redirect_to game_path
+      return
+    end
+    begin
+      if !@game.player1.board.check_occupant_colour_matches_turn(oppositeColour, x, y)
+        flash.alert = "The intersection selected to capture a piece does not have a piece that belongs to the opponent. Please select another intersection."
+        redirect_to game_path
+        return
+      end
+    rescue
+      flash.alert = "Please provide a valid intersection to capture a piece."
+      redirect_to game_path
+      return
+    end
+
+    player = getCurrentPlayerObj(@game, current_player)
+    player.board.remove_piece(x, y)
+    current_player.mill_found = false
+    @game.alternate_turn()
+    
     gameJson = @game.to_json()
     current_player.game = gameJson
     current_player.save()

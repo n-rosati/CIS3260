@@ -60,31 +60,68 @@
       <div class="d-flex justify-content-center">
         <div class="card text-center p-5">
           
-          <% if @game.player1.name() == current_player.email %>
-            <% bag = @game.player1.bag %>
-          <% else %>
-            <% bag = @game.player2.bag %>
-          <% end %>
+          <% player = getCurrentPlayerObj(@game, current_player) %>
+          <% bag = player.bag %>
 
-          <% if bag.length > 0 %>
+          <%# Game Over %>
+          <% puts(@game.player1.board.count_pieces_on_board(:white), @game.player1.board.count_pieces_on_board(:black)) %>
+          <% if @game.player1.board.count_pieces_on_board(:white) == 0 || @game.player1.board.count_pieces_on_board(:black) == 0 %>
+                  
+            <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
+            <br/>
+            <% if player.board.count_pieces_on_board(player.colour) == 0 %>
+              <pre><b>You lost!</b></pre>
+            <% else %>
+              <pre><b>You win!</b></pre>
+            <% end %>
+            <br/>
+
+            <div style="text-align:center">
+              <%= link_to "Play Again", matchmaking_path, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+              <%= link_to "Homepage", :authenticated_root, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+            </div>
+
+          <%# Capture Piece %>
+          <% elsif current_player.mill_found == true %>
 
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
             <pre><b>Current turn:</b> <%= @game.turn_colour.to_s().capitalize() %></pre>
             <br/>
-            <pre><b>Pieces in bag:</b> <%= bag.length %></pre>
-            <br/>
 
             <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
             <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
             <%= form_tag(game_path, method: "get") do %>
-              <pre> <b>Choose where to place your piece.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
+              <pre> <b>Choose a piece to capture.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
               <div style="text-align:right">
-                <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
+                <%= submit_tag("Capture", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
               </div>
             <% end %>
             <br/><br/>
-          <% else %>
+
+          <%# Place Piece %>
+          <% elsif bag.length > 0 %>
+
+              <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
+              <br/>
+              <pre><b>Current turn:</b> <%= @game.turn_colour.to_s().capitalize() %></pre>
+              <br/>
+              <pre><b>Pieces in bag:</b> <%= bag.length %></pre>
+              <br/>
+
+              <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
+              <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
+              <%= form_tag(game_path, method: "get") do %>
+                <pre> <b>Choose where to place your piece.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
+                <div style="text-align:right">
+                  <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
+                </div>
+              <% end %>
+              <br/><br/>
+          
+          <%# Move Piece %>
+          <% elsif bag.length == 0 %>
+
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
 

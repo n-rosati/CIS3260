@@ -1,7 +1,7 @@
 
 class ApplicationController < ActionController::Base
 
-    helper_method :gameJsonToGameObj, :intersectionsToString, :intersectionToString, :moveCheck
+    helper_method :gameJsonToGameObj, :intersectionsToString, :intersectionToString, :getCurrentPlayerObj, :isMoveAdjacent
 
     private
 
@@ -71,34 +71,43 @@ class ApplicationController < ActionController::Base
         end
       end
 
-      def moveCheck(from_x, from_y, to_x, to_y)
+      def getCurrentPlayerObj(game, current_player)
+        if game.player1.name() == current_player.email
+          return game.player1
+        elsif game.player2.name() == current_player.email
+          return game.player2
+        end
+      end
+
+      def isMoveAdjacent(from_x, from_y, to_x, to_y)
 
         centre = 3
-        from_centre_x = abs(from_x-centre)
-        from_centre_y = abs(from_y-centre)
+        from_centre_x = abs(from_x - centre)
+        from_centre_y = abs(from_y - centre)
         can_move_x = from_centre_y
         can_move_y = from_centre_x
-        if(can_move_x == 0)
-          can_move_x=1
+        if can_move_x == 0
+          can_move_x = 1
         end
-        if(can_move_y==0)
-          can_move_y =1
+        if can_move_y == 0
+          can_move_y = 1
         end
+
         diff_x = abs(from_x - to_x)
-        diff_y = abs(from_y - to_y)
-        puts(from_centre_x, from_centre_y, can_move_x, can_move_y, diff_x, diff_y)
-    
+        diff_y = abs(from_y - to_y)    
     
         return ((diff_y == can_move_y &&  from_x == to_x) || (diff_x == can_move_x && from_y == to_y))
     
       end
 
       def abs(x)
-        if(x<0)
-          return x*-1
+        
+        if (x < 0)
+          return x * -1
         else
           return x
         end
+
       end
 
 end

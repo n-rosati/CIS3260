@@ -40,8 +40,8 @@ class GameBoard
 		count = 0
 		@intersections&.each do |i|
 			i.each do |j|
-				if j.instance_of?(Intersection) && j.get_occupant_colour == colour
-					++count
+				if j.instance_of?(Intersection) && j.get_occupant_colour == colour.to_s()
+					count += 1
 				end
 			end
 		end
@@ -163,6 +163,7 @@ class GameBoard
 		piece_in_vertical_mill = true
 		piece_in_horizontal_mill = true
 
+		colour = colour.to_s
 		if x == 3
 			if y < 3
 				(0..3).each { |i|
