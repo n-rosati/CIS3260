@@ -40,7 +40,7 @@ class GameBoard
 		count = 0
 		@intersections&.each do |i|
 			i.each do |j|
-				if j.instance_of?(Intersection) && j.get_occupant_colour? == colour
+				if j.instance_of?(Intersection) && j.get_occupant_colour == colour
 					++count
 				end
 			end
@@ -55,6 +55,7 @@ class GameBoard
 	# @param [Integer] piece_x Source Intersection x coordinate
 	# @param [Integer] piece_y Source Intersection y coordinate
 	def place_and_remove_piece(x, y, piece_x, piece_y)
+		puts("x: #{x}, y: #{y}, piece_x: #{piece_x}, piece_y: #{piece_y}")
 		if !x.is_a?(Integer)
 			raise TypeError("First parameter must be an integer")
 		elsif !y.is_a?(Integer)
@@ -82,7 +83,7 @@ class GameBoard
 	# @param [Integer] y Intersection y coordinate
 	# @param [Piece] piece Piece to place on the board
 	def place_piece(x, y, piece)
-		puts("place_piece(#{x}, #{y}, { \"colour\": #{piece.colour()} })")
+		# puts("place_piece(#{x}, #{y}, { \"colour\": #{piece.colour()} })")
 		if !x.is_a?(Integer)
 			raise TypeError("First parameter must be a integer")
 		elsif !y.is_a?(Integer)
@@ -137,7 +138,7 @@ class GameBoard
 			raise ArgumentError("Invalid intersection y coordinate")
 		end
 
-		@intersections[x][y].get_occupant_colour? == turn_colour
+		@intersections[x][y].get_occupant_colour == turn_colour.to_s()
 	end
 
 	# @param [Symbol] colour Colour of the Piece to check
@@ -166,7 +167,7 @@ class GameBoard
 			if y < 3
 				(0..3).each { |i|
 					if @intersections[x] != nil && @intersections[x][i] != nil
-						if @intersections[x][i].get_occupant_colour? != colour
+						if @intersections[x][i].get_occupant_colour != colour
 							piece_in_vertical_mill = false
 						end
 					end
@@ -174,7 +175,7 @@ class GameBoard
 			else
 				(4..7).each { |i|
 					if @intersections[x] != nil && @intersections[x][i] != nil
-						if @intersections[x][i].get_occupant_colour? != colour
+						if @intersections[x][i].get_occupant_colour != colour
 							piece_in_vertical_mill = false
 						end
 					end
@@ -183,7 +184,7 @@ class GameBoard
 
 			(0..7).each { |i|
 				if @intersections[i] != nil && @intersections[i][y] != nil
-					if @intersections[i][y].get_occupant_colour? != colour
+					if @intersections[i][y].get_occupant_colour != colour
 						piece_in_horizontal_mill = false
 					end
 				end
@@ -192,7 +193,7 @@ class GameBoard
 			if x < 3
 				(0..3).each { |i|
 					if @intersections[i] != nil && @intersections[i][y] != nil
-						if @intersections[i][y].get_occupant_colour? != colour
+						if @intersections[i][y].get_occupant_colour != colour
 							piece_in_horizontal_mill = false
 						end
 					end
@@ -200,7 +201,7 @@ class GameBoard
 			else
 				(4..6).each { |i|
 					if @intersections[i] != nil && @intersections[i][y] != nil
-						if @intersections[i][y].get_occupant_colour? != colour
+						if @intersections[i][y].get_occupant_colour != colour
 							piece_in_horizontal_mill = false
 						end
 					end
@@ -208,7 +209,7 @@ class GameBoard
 			end
 			(0..7).each { |i|
 				if @intersections[i] != nil && @intersections[i][y] != nil
-					if @intersections[i][y].get_occupant_colour? != colour
+					if @intersections[i][y].get_occupant_colour != colour
 						piece_in_vertical_mill = false
 					end
 				end
@@ -216,21 +217,21 @@ class GameBoard
 		else
 			(0..7).each { |i|
 				if @intersections[x] != nil && @intersections[x][i] != nil
-					if @intersections[x][i].get_occupant_colour? != colour
+					if @intersections[x][i].get_occupant_colour != colour
 						piece_in_vertical_mill = false
 					end
 				end
 			}
 			(0..7).each { |i|
 				if @intersections[x] != nil && @intersections[x][i] != nil
-					if @intersections[x][i].get_occupant_colour? != colour
+					if @intersections[x][i].get_occupant_colour != colour
 						piece_in_vertical_mill = false
 					end
 				end
 			}
 			(0..7).each { |i|
 				if @intersections[i] != nil && @intersections[i][y] != nil
-					if @intersections[i][y].get_occupant_colour? != colour
+					if @intersections[i][y].get_occupant_colour != colour
 						piece_in_horizontal_mill = false
 					end
 				end
@@ -247,7 +248,7 @@ class GameBoard
 		retval = false
 		@intersections&.each do |i|
 			i.each do |j|
-				if @intersections[i][j].get_occupant_colour? == colour
+				if @intersections[i][j].get_occupant_colour == colour
 					retval = true unless is_piece_in_mill(colour, i, j)
 				end
 			end

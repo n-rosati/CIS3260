@@ -53,11 +53,11 @@ class GamesController < ApplicationController
     board_obj = GameBoard.new(intersections)
 
     current_player_bag_obj = Bag.new()
-    for i in 0..8
+    for i in 0..0
 			current_player_bag_obj.store_piece(Piece.new(current_player.colour.to_sym()))
 		end
     opponent_player_bag_obj = Bag.new()
-    for i in 0..8
+    for i in 0..0
 			opponent_player_bag_obj.store_piece(Piece.new(opponent_player.colour.to_sym()))
 		end
     
@@ -82,10 +82,14 @@ class GamesController < ApplicationController
     end
     if params["commit"] == "Place"
       place_piece(params)
+    elsif params["commit"] == "Move"
+      move_piece(params)
     end
+    
 
   end
 
+  private
   def place_piece(params)
 
     x = params['x'].ord() - 97
@@ -145,39 +149,77 @@ class GamesController < ApplicationController
   
   def move_piece(params)
 
-    from_x = params['from_x']
-    from_y = params['from_y'].to_i()
-    to_x = params['to_x']
-    to_y = params['to_y'].to_i()
+    from_x = params['from_x'].ord() - 97
+    from_y = params['from_y'].to_i() - 1
+    to_x = params['to_x'].ord() - 97
+    to_y = params['to_y'].to_i() - 1
+
+    from_coordinate = params['from_x'] + params['from_y']
+    to_coordinate = params['to_x'] + params['to_y']
+    valid_intersections = ['a7', 'd7', 'g7', 'b6', 'd6', 'f6', 'c5', 'd5', 'e5', 'a4', 'b4', 'c4', 'e4', 'f4', 'g4', 'c3', 'd3', 'e3', 'b2', 'd2', 'f2', 'a1', 'd1', 'g1']
+    if @game.turn_colour != current_player.colour.to_sym()
+      flash.alert = "Please wait your turn. Opponent player is taking turn."
+      redirect_to game_path
+      return
+    end
+    if !valid_intersections.include?(from_coordinate) 
+      flash.alert = "Please provide a valid intersection to move the piece from."
+      redirect_to game_path
+      return
+    elsif !valid_intersections.include?(to_coordinate)
+      flash.alert = "Please provide a valid intersection to move the piece to."
+      redirect_to game_path
+      return
+    elsif @game.player1.board.is_empty_intersection(from_x, from_y)
+      flash.alert = "The intersection selected to move piece from is occupied. Please select another intersection."
+      redirect_to game_path
+      return
+    elsif !@game.player1.board.is_empty_intersection(to_x, to_y)
+      flash.alert = "The intersection selected to move piece to is occupied. Please select another intersection."
+      redirect_to game_path
+      return
+    elsif !@game.player1.board.check_occupant_colour_matches_turn(@game.turn_colour, from_x, from_y)
+      flash.alert = "The intersection selected to move a piece from has a piece that does not belong to you. Please select another intersection."
+      redirect_to game_path
+      return
+    elsif !moveCheck(from_x, from_y, to_x, to_y)
+      flash.alert = "The intersection selected to move a piece to is not adjacent to the intersection selected to move a piece from. Please select another intersection."
+      redirect_to game_path
+      return
+    end
+
+
+    
 
     curr_player_colour = current_player.colour.to_sym()
     if @game.player1.colour == curr_player_colour
 
-      if @game.turn_colour == :white && @game.player1.board.check_occupant_colour_matches_turn(from_x, from_y, :white)
+      if @game.turn_colour == :white && @game.player1.board.check_occupant_colour_matches_turn(:white, from_x, from_y)
         @game.player1.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
         @game.alternate_turn()
-      elsif @game.turn_colour == :black && @game.player1.board.check_occupant_colour_matches_turn(from_x, from_y, :black)
+      elsif @game.turn_colour == :black && @game.player1.board.check_occupant_colour_matches_turn(:black, from_x, from_y)
         @game.player1.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
         @game.alternate_turn()
       end
 
     elsif @game.player2.colour == curr_player_colour
 
-      if @game.turn_colour == :white && @game.player2.board.check_occupant_colour_matches_turn(from_x, from_y, :white)
+      if @game.turn_colour == :white && @game.player2.board.check_occupant_colour_matches_turn(:white, from_x, from_y)
         @game.player2.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
         @game.alternate_turn()
-      elsif @game.turn_colour == :black && @game.player2.board.check_occupant_colour_matches_turn(from_x, from_y, :black)
+      elsif @game.turn_colour == :black && @game.player2.board.check_occupant_colour_matches_turn(:black,from_x, from_y)
         @game.player2.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
         @game.alternate_turn()
       end
       
     end
 
-    current_player.game = @game.to_json()
+    gameJson = @game.to_json()
+    current_player.game = gameJson
     current_player.save()
 
     opponent_player = Player.find(current_player.opponent_id)
-    opponent_player.game = game_obj.to_json()
+    opponent_player.game = gameJson
     opponent_player.save()
 
     redirect_to game_path

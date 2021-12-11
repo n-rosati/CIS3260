@@ -67,7 +67,7 @@ class Intersection
 		if !!@occupant
 			@occupant.colour.to_s()
 		else
-			"nil"
+			""
 		end
 	end
 end

@@ -11,6 +11,7 @@
       <div class="d-flex justify-content-center">
         <div class="card text-center p-5">
 
+          <% if false %>
           <% puts("Number of rows: #{@game.player1.board.intersections.length()}") %>
           <% @game.player1.board.intersections.each do |r| %>
             <% r&.each do |c| %>
@@ -22,6 +23,8 @@
             <% end %>
             <% puts("") %>
           <% end %>
+          <% end %>
+
           <% intersections = @game.player1.board.intersections.transpose() %>
           <% row1 = intersectionsToString(intersections[6]) %>
           <% row2 = intersectionsToString(intersections[5]) %>
@@ -64,6 +67,7 @@
           <% end %>
 
           <% if bag.length > 0 %>
+
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
             <pre><b>Current turn:</b> <%= @game.turn_colour.to_s().capitalize() %></pre>
@@ -83,23 +87,23 @@
           <% else %>
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
-            <pre><b>Pieces in bag:</b> bag.length</pre>
-            <br/>
 
             <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
             <% y_options = [1, 2, 3, 4, 5, 6, 7] %>
             <%= form_tag(game_path, method: "get") do %>
-              <pre> <b>Choose a piece to move.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
-              <div style="text-align:right">
-                <%= submit_tag("Place", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
-              </div>
+
+              <pre><b>Current turn:</b> <%= @game.turn_colour.to_s().capitalize() %></pre>
               <br/>
-              <pre> <b>Choose where to move your piece to.</b>   <b>X:</b> <%= select_tag "x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "y", options_for_select(y_options) %> </pre>
+
+              <pre> <b>Choose a piece to move.</b>   <b>X:</b> <%= select_tag "from_x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "from_y", options_for_select(y_options) %> </pre>
+
+              <pre> <b>Choose where to move your piece to.</b>   <b>X:</b> <%= select_tag "to_x", options_for_select(x_options) %>   <b>Y:</b> <%= select_tag "to_y", options_for_select(y_options) %> </pre>
               <div style="text-align:right">
                 <%= submit_tag("Move", class: "btn btn-block btn-secondary btn-lg btn-shadow mt-3") %>
               </div>
             <% end %>
             <br/><br/>
+    
           <% end %>
 
         </div>
@@ -109,11 +113,13 @@
   </div>
 
   <% if @game.turn_colour != current_player.colour.to_sym() %>
+    <% if false %>
     <script>
       setTimeout(function() {
         window.location.href = "/games/index";
       }, 2000);
     </script>
+    <% end %>
   <% end %>
 
 <% else %>
@@ -128,10 +134,12 @@
     </div>
   </div>
 
+<% if false %>
 <script>
   setTimeout(function() {
     window.location.href = "/games/index";
   }, 5000);
 </script>
+<% end %>
 
 <% end %>

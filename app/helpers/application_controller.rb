@@ -1,6 +1,7 @@
+
 class ApplicationController < ActionController::Base
 
-    helper_method :gameJsonToGameObj, :intersectionsToString, :intersectionToString
+    helper_method :gameJsonToGameObj, :intersectionsToString, :intersectionToString, :moveCheck
 
     private
 
@@ -50,7 +51,7 @@ class ApplicationController < ActionController::Base
         intersection_strings = []
         curr_row = 0
         intersections.each do |i|
-          puts("Row #{curr_row}")
+          # puts("Row #{curr_row}")
           curr_row += 1
           if i != nil
             intersection_strings << intersectionToString(i)
@@ -60,13 +61,43 @@ class ApplicationController < ActionController::Base
       end
 
       def intersectionToString(intersection)
-        puts("Intersection at (#{intersection.x}, #{intersection.y})")
+        # puts("Intersection at (#{intersection.x}, #{intersection.y})")
         if intersection.occupant == nil
           return "⬜"
         elsif intersection.occupant.colour == :white
           return "⚪"
         elsif intersection.occupant.colour == :black
           return "⚫"
+        end
+      end
+
+      def moveCheck(from_x, from_y, to_x, to_y)
+
+        centre = 3
+        from_centre_x = abs(from_x-centre)
+        from_centre_y = abs(from_y-centre)
+        can_move_x = from_centre_y
+        can_move_y = from_centre_x
+        if(can_move_x == 0)
+          can_move_x=1
+        end
+        if(can_move_y==0)
+          can_move_y =1
+        end
+        diff_x = abs(from_x - to_x)
+        diff_y = abs(from_y - to_y)
+        puts(from_centre_x, from_centre_y, can_move_x, can_move_y, diff_x, diff_y)
+    
+    
+        return ((diff_y == can_move_y &&  from_x == to_x) || (diff_x == can_move_x && from_y == to_y))
+    
+      end
+
+      def abs(x)
+        if(x<0)
+          return x*-1
+        else
+          return x
         end
       end
 
