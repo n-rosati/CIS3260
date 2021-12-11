@@ -65,7 +65,7 @@
 
           <%# Game Over %>
           <% puts(@game.player1.board.count_pieces_on_board(:white), @game.player1.board.count_pieces_on_board(:black)) %>
-          <% if @game.player1.board.count_pieces_on_board(:white) == 0 || @game.player1.board.count_pieces_on_board(:black) == 0 %>
+          <% if bag.length == 0 && ( @game.player1.board.count_pieces_on_board(:white) == 0 || @game.player1.board.count_pieces_on_board(:black) == 0) %>
                   
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
