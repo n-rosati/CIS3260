@@ -1,7 +1,7 @@
 
 class ApplicationController < ActionController::Base
 
-    helper_method :gameJsonToGameObj, :intersectionsToString, :intersectionToString, :getCurrentPlayerObj, :isMoveAdjacent
+    helper_method :gameJsonToGameObj, :intersectionsToString, :intersectionToString, :getPlayerObj, :isMoveAdjacent, :abs
 
     private
 
@@ -71,11 +71,11 @@ class ApplicationController < ActionController::Base
         end
       end
 
-      def getCurrentPlayerObj(game, current_player)
-        if game.player1.name() == current_player.email
-          return game.player1
-        elsif game.player2.name() == current_player.email
-          return game.player2
+      def getPlayerObj(game_obj, player_db_model)
+        if game_obj.player1.name() == player_db_model.email
+          return game_obj.player1
+        elsif game_obj.player2.name() == player_db_model.email
+          return game_obj.player2
         end
       end
 

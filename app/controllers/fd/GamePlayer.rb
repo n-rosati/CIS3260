@@ -36,7 +36,7 @@ class GamePlayer
 	# @param [Integer] y Intersection y coordinate
 	# @param [Piece] piece Piece to place at intersection (x,y)
 	def place_piece_on_board(x, y, piece)
-		puts("place_piece_on_board(#{x}, #{y}, { \"colour\": #{piece.colour()} })")
+		# puts("place_piece_on_board(#{x}, #{y}, { \"colour\": #{piece.colour()} })")
 		if !x.is_a?(Integer)
 			raise TypeError("First parameter must be an integer")
 		elsif !y.is_a?(Integer)

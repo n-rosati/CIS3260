@@ -1,0 +1,22 @@
+<div class="row" style="text-align:center">
+  <div><%= image_tag "welcome.jpg", alt:"Welcome to Nine Men's Morris", size:"600x170" %></div>
+</div>
+<br/><br/><br/><br/>
+
+<div class="row" style="text-align:center">
+  <div><%= image_tag "matchmaking.jpg", alt:"Finding a Match... Please Wait.", size:"200x140" %></div>
+</div>
+
+<script>
+  setTimeout(function() {
+    window.location.reload();
+  }, 3000);
+</script>
+
+<% if current_player.opponent_id != -1 %>
+  <script>
+    setTimeout(function() {
+      window.location.href = "/games/index";
+    }, 3000);
+  </script>
+<% end %>

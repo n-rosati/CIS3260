@@ -2,8 +2,20 @@ require_relative './fd/Final_Design_Classes.rb'
 
 class GamesController < ApplicationController
 
-  # Matchmaking Page
-  def matchmaking()
+  # find_match Page
+  def find_match()
+    
+    if current_player.game != nil
+      current_player.game = nil
+      current_player.save()
+      if current_player.opponent_id != -1
+        opponent_player = Player.find(current_player.opponent_id)
+        opponent_player.game = nil
+        opponent_player.save()
+      end
+      redirect_to find_match_path
+      return
+    end
 
     has_opponent = false
     if current_player.opponent_id != -1
@@ -15,12 +27,12 @@ class GamesController < ApplicationController
 
     if has_opponent == false
       Player.all.each do |p|
-        # skip invalid possibilities
+        # Skip players in database who are not searching for a game and already have an opponent
         if p.id == current_player.id || p.opponent_id != -1 || p.searching == false
           next
         end
         
-        # opponent found
+        # If opponent player found who is searching for a game and does not already have an opponent, 
         current_player.colour = "white"
         current_player.searching = false
         current_player.opponent_id = p.id
@@ -34,7 +46,6 @@ class GamesController < ApplicationController
       end
       
       if has_opponent == false
-        redirect_to game_path
         return
       end
     end
@@ -53,11 +64,11 @@ class GamesController < ApplicationController
     board_obj = GameBoard.new(intersections)
 
     current_player_bag_obj = Bag.new()
-    for i in 0..2
+    for i in 0..8
 			current_player_bag_obj.store_piece(Piece.new(current_player.colour.to_sym()))
 		end
     opponent_player_bag_obj = Bag.new()
-    for i in 0..2
+    for i in 0..8
 			opponent_player_bag_obj.store_piece(Piece.new(opponent_player.colour.to_sym()))
 		end
     
@@ -70,15 +81,20 @@ class GamesController < ApplicationController
     opponent_player.game = game_obj.to_json()
     opponent_player.save()
 
-    redirect_to game_path
-
   end
 
   # Game Page
   def index()
 
+    if current_player.opponent_id == -1
+      redirect_to :authenticated_root
+      return
+    end
     if current_player.game != nil
       @game = gameJsonToGameObj(current_player.game)
+      @current_player_obj = getPlayerObj(@game, current_player)
+      @opponent_player = Player.find(current_player.opponent_id)
+      @opponent_player_obj = getPlayerObj(@game, @opponent_player)
     end
     if params["commit"] == "Place"
       place_piece(params)
@@ -86,11 +102,30 @@ class GamesController < ApplicationController
       move_piece(params)
     elsif params["commit"] == "Capture"
       capture_piece(params)
+    elsif params["commit"] == "Forfeit"
+      current_player.losses += 1
+      current_player.game = nil
+      current_player.opponent_id = -1
+      @opponent_player.wins += 1
+      @opponent_player.game = nil
+      @opponent_player.opponent_id = -1
+      current_player.save()
+      @opponent_player.save()
+      redirect_to :authenticated_root
+      return
+    elsif params["commit"] == "Propose Draw"
+      current_player.game = nil
+      current_player.opponent_id = -1
+      @opponent_player.game = nil
+      @opponent_player.opponent_id = -1
+      current_player.save()
+      @opponent_player.save()
+      redirect_to :authenticated_root
+      return
     end
     
   end
 
-  private
   def place_piece(params)
 
     x = params['x'].ord() - 97
@@ -104,21 +139,17 @@ class GamesController < ApplicationController
       return
     end
     if !valid_intersections.include?(coordinate)
-      flash.alert = "Please provide a valid intersection to proceed with piece placement."
+      flash.alert = "Please provide a valid intersection to place the piece."
       redirect_to game_path
       return
     elsif !@game.player1.board.is_empty_intersection(x, y)
-      puts(x, y)
       flash.alert = "The intersection selected is occupied. Please select another intersection."
       redirect_to game_path
       return
     end
 
-    player = getCurrentPlayerObj(@game, current_player)
-    player.place_piece_on_board(x, y, player.bag.select_piece)
-    puts(current_player.mill_found)
-    current_player.mill_found = player.board.is_piece_in_mill(current_player.colour.to_sym(), x, y)
-    puts(current_player.mill_found)
+    @current_player_obj.place_piece_on_board(x, y, @current_player_obj.bag.select_piece)
+    current_player.mill_found = @current_player_obj.board.is_piece_in_mill(current_player.colour.to_sym(), x, y)
     if current_player.mill_found == false
       @game.alternate_turn()
     end
@@ -127,9 +158,8 @@ class GamesController < ApplicationController
     current_player.game = gameJson
     current_player.save()
 
-    opponent_player = Player.find(current_player.opponent_id)
-    opponent_player.game = gameJson
-    opponent_player.save()
+    @opponent_player.game = gameJson
+    @opponent_player.save()
 
     redirect_to game_path
     
@@ -176,9 +206,8 @@ class GamesController < ApplicationController
       return
     end
 
-    player = getCurrentPlayerObj(@game, current_player)
-    player.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
-    current_player.mill_found = player.board.is_piece_in_mill(current_player.colour.to_sym(), to_x, to_y)
+    @current_player_obj.board.place_and_remove_piece(to_x, to_y, from_x, from_y)
+    current_player.mill_found = @current_player_obj.board.is_piece_in_mill(current_player.colour.to_sym(), to_x, to_y)
     if current_player.mill_found == false
       @game.alternate_turn()
     end
@@ -187,9 +216,8 @@ class GamesController < ApplicationController
     current_player.game = gameJson
     current_player.save()
 
-    opponent_player = Player.find(current_player.opponent_id)
-    opponent_player.game = gameJson
-    opponent_player.save()
+    @opponent_player.game = gameJson
+    @opponent_player.save()
 
     redirect_to game_path
 
@@ -218,8 +246,7 @@ class GamesController < ApplicationController
       return
     end
 
-    player = getCurrentPlayerObj(@game, current_player)
-    player.board.remove_piece(x, y)
+    @current_player_obj.board.remove_piece(x, y)
     current_player.mill_found = false
     @game.alternate_turn()
     
@@ -227,9 +254,8 @@ class GamesController < ApplicationController
     current_player.game = gameJson
     current_player.save()
 
-    opponent_player = Player.find(current_player.opponent_id)
-    opponent_player.game = gameJson
-    opponent_player.save()
+    @opponent_player.game = gameJson
+    @opponent_player.save()
 
     redirect_to game_path
 

@@ -55,7 +55,7 @@ class GameBoard
 	# @param [Integer] piece_x Source Intersection x coordinate
 	# @param [Integer] piece_y Source Intersection y coordinate
 	def place_and_remove_piece(x, y, piece_x, piece_y)
-		puts("x: #{x}, y: #{y}, piece_x: #{piece_x}, piece_y: #{piece_y}")
+		# puts("x: #{x}, y: #{y}, piece_x: #{piece_x}, piece_y: #{piece_y}")
 		if !x.is_a?(Integer)
 			raise TypeError("First parameter must be an integer")
 		elsif !y.is_a?(Integer)

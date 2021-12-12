@@ -1,11 +1,8 @@
 Rails.application.routes.draw do
 
-  # devise_for :players
   resources :players, only: :edit
 
-  # get 'games', to: 'games#new', :as => 'default_game'
-  # get 'games/new', to: 'games#new', :as => 'new_game'
-  get 'games/matchmaking' , to: 'games#matchmaking', :as => 'matchmaking'
+  get 'games/find_match' , to: 'games#find_match', :as => 'find_match'
   get 'games/index', to: 'games#index', :as => 'game'
 
   unauthenticated :player do

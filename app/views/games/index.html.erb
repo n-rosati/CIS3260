@@ -49,7 +49,14 @@
             <pre>  <%= "    |                       |                       |" %>  </pre>
             <pre>  <%= "1   %s  — — — — — — — — —  %s  — — — — — — — — —  %s" % row7 %>  </pre>
             <pre>  <%= "    a       b       c       d       e       f       g" %>  </pre>
-            <%# .format([o, ⬜, ⬛, ⚪, ⚫]) %>
+          </div>
+          <br/>
+
+          <div style="text-align:center">
+            <%= form_tag "#" do %>
+              <%= link_to "Forfeit", game_path(commit: "Forfeit"), method: :get, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+              <%= link_to "Propose Draw", game_path(commit: "Propose Draw"), method: :get, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+            <% end %>
           </div>
 
         </div>
@@ -59,25 +66,25 @@
     <div class="col-lg-6 col-md-6 col-sm-12">
       <div class="d-flex justify-content-center">
         <div class="card text-center p-5">
-          
-          <% player = getCurrentPlayerObj(@game, current_player) %>
-          <% bag = player.bag %>
 
           <%# Game Over %>
-          <% puts(@game.player1.board.count_pieces_on_board(:white), @game.player1.board.count_pieces_on_board(:black)) %>
-          <% if bag.length == 0 && ( @game.player1.board.count_pieces_on_board(:white) == 0 || @game.player1.board.count_pieces_on_board(:black) == 0) %>
+          <% if @current_player_obj.bag.length == 0 && @opponent_player_obj.bag.length == 0 && (@game.player1.board.count_pieces_on_board(:white) < 3 || @game.player1.board.count_pieces_on_board(:black) < 3) %>
                   
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
-            <% if player.board.count_pieces_on_board(player.colour) == 0 %>
+            <% if @current_player_obj.board.count_pieces_on_board(@current_player_obj.colour) < 3 %>
+              <% current_player.losses += 1 %>
+              <% current_player.save() %>
               <pre><b>You lost!</b></pre>
             <% else %>
               <pre><b>You win!</b></pre>
+              <% @opponent_player.wins += 1 %>
+              <% @opponent_player.save() %>
             <% end %>
             <br/>
 
             <div style="text-align:center">
-              <%= link_to "Play Again", matchmaking_path, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+              <%= link_to "Play Again", find_match_path, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
               <%= link_to "Homepage", :authenticated_root, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
             </div>
 
@@ -100,13 +107,13 @@
             <br/><br/>
 
           <%# Place Piece %>
-          <% elsif bag.length > 0 %>
+          <% elsif @current_player_obj.bag.length > 0 %>
 
               <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
               <br/>
               <pre><b>Current turn:</b> <%= @game.turn_colour.to_s().capitalize() %></pre>
               <br/>
-              <pre><b>Pieces in bag:</b> <%= bag.length %></pre>
+              <pre><b>Pieces in bag:</b> <%= @current_player_obj.bag.length %></pre>
               <br/>
 
               <% x_options = ["a", "b", "c", "d", "e", "f", "g"] %>
@@ -120,7 +127,7 @@
               <br/><br/>
           
           <%# Move Piece %>
-          <% elsif bag.length == 0 %>
+          <% elsif @current_player_obj.bag.length == 0 %>
 
             <pre><b>You are:</b> <%= current_player.colour.capitalize() %></pre>
             <br/>
@@ -150,10 +157,10 @@
   </div>
 
   <% if @game.turn_colour != current_player.colour.to_sym() %>
-    <% if false %>
+    <% if true %>
     <script>
       setTimeout(function() {
-        window.location.href = "/games/index";
+        window.location.reload();
       }, 2000);
     </script>
     <% end %>
@@ -166,15 +173,19 @@
       <div class="card text-center p-5">
 
         <h6>Please wait for game to start. Looking for opponent.</h6>
+        <br/>
+        <div style="text-align:center">
+          <%= link_to "Cancel", :authenticated_root, class:'btn btn-block btn-secondary btn-lg btn-shadow mt-3' %>
+        </div>
 
       </div>
     </div>
   </div>
 
-<% if false %>
+<% if true %>
 <script>
   setTimeout(function() {
-    window.location.href = "/games/index";
+    window.location.reload();
   }, 5000);
 </script>
 <% end %>
